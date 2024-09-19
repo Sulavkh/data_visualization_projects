@@ -1,26 +1,32 @@
 from pathlib import Path
 import json
+import plotly.express as px
 
 # read data as a string and conver tot Python object
-path = Path('eq_data/eq_data_1_day_m1.geojson')
+path = Path('eq_data/eq_data_30_day_m1.geojson')
 contents =  path.read_text()
 all_eq_data = json.loads(contents)
 
 #examine all earthquake in dataset
 all_eq_dicts = all_eq_data['features']
 
-mags, lons, lats =[], [], []
+mags, lons, lats, eq_titles =[], [], [], []
 for eq_dict in all_eq_dicts:
     mag = eq_dict['properties']['mag']
     lon = eq_dict['geometry']['coordinates'][0]
     lat = eq_dict['geometry']['coordinates'][1]
+    eq_title = eq_dict['properties']['title']
     mags.append(mag)
     lons.append(lon)
     lats.append(lat)
+    eq_titles.append(eq_title)
 
-print(mags[:10])
-print(lons[:10])
-print(lats[:10])
+title = "Global Earthquakes"
+fig = px.scatter_geo(lat=lats, lon=lons, size=mags, title=title, color=mags, 
+    color_continuous_scale='blackbody_r', labels={'color':'Magnitude'}, projection='natural earth',
+    hover_name=eq_titles,
+    )
+fig.show()
 
 """
 #create more readable data
